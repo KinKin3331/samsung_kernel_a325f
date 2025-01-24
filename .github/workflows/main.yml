@@ -20,7 +20,7 @@ jobs:
       env:
         NAME: Loganysl
       with:
-        arch: arm64/arm32
+        arch: arm64
         compiler: gcc/12
         defconfig: a32_defconfig
         image: Image.gz-dtb
