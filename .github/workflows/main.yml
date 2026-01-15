@@ -1,34 +1,33 @@
-name: Kernel Build
+name: Build Kernel A32 (KernelSU Next + SUSFS)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-22.04
+
     steps:
-    - name: Checkout kernel source
+    - name: Checkout source
       uses: actions/checkout@v4
 
-    - name: Set up MemKernel as a module (M-OUT) with specified name
+    - name: Install dependencies
       run: |
-        curl -LSs "https://raw.githubusercontent.com/Poko-Apps/MemKernel/main/kernel/setup.sh" | bash -s Y
-        
-    - name: Android kernel build
-      uses: lemniskett/android-kernel-actions@master
-      id: build
-      env:
-        NAME: Loganysl
-      with:
-        arch: arm64
-        compiler: gcc/12
-        defconfig: defconfig
-        image: Image.gz-dtb
+        sudo apt update
+        sudo apt install -y \
+          git bc bison flex build-essential \
+          libssl-dev libelf-dev \
+          clang lld llvm python3
 
-    - name: Upload Kernel and Module
+    - name: Build kernel
+      run: |
+        chmod +x build.sh
+        ./build.sh
+
+    - name: Upload kernel
       uses: actions/upload-artifact@v4
       with:
-        name: modulekernelcheat
-        path: |
-          ${{ steps.build.outputs.outfile }}
-          ./out/drivers/memkernel/memkernel.ko
+        name: Kernel-A32-KSU-SUSFS
+        path: out/arch/arm64/boot/Image.gz
