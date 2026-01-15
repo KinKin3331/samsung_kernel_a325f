@@ -1,0 +1,33 @@
+name: Build Kernel A32 (KernelSU Next + SUSFS)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y \
+          git bc bison flex build-essential \
+          libssl-dev libelf-dev \
+          clang lld llvm python3
+
+    - name: Build kernel
+      run: |
+        chmod +x build.sh
+        ./build.sh
+
+    - name: Upload kernel
+      uses: actions/upload-artifact@v4
+      with:
+        name: Kernel-A32-KSU-SUSFS
+        path: out/arch/arm64/boot/Image.gz
